@@ -4,17 +4,16 @@ function submitForm(){
         postData[$(this).attr("name")] = parseInt($(this).attr("value"));
     });
     console.log(postData)
-    displayResult({})
-    // $.ajax({
-    //     type: "post",
-    //     url: "../api",
-    //     data: JSON.stringify(postData),
-    //     success: displayResult,
-    //     error: function (data) {
-    //         $("p").html("Sorry, an error occurred processing your request, don't hesitate to send me a mail to lionel.savouillan@gmail.com and please try again later");
-    //         $("form").remove()
-    //     },
-    // });
+    $.ajax({
+        type: "post",
+        url: "../api",
+        data: JSON.stringify(postData),
+        success: displayResult,
+        error: function (data) {
+            $("p").html("Sorry, an error occurred processing your request, don't hesitate to send me a mail to lionel.savouillan@gmail.com and please try again later");
+            $("form").remove()
+        },
+    });
 }
 
 function displayResult(data) {
