@@ -5,5 +5,5 @@ handlers:
 - url: /web
   static_dir: web
 
-- url: /.*
+- url: /api
   script: _go_app
