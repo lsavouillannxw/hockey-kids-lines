@@ -35,6 +35,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		PossibleLinesAsArray: make([]uint16, 0),
 		PossibleGames: make([]*game, 0),
 	}
+	if body.NumberOfPlayers > 16 || body.NumberOfPlayers < 7 || body.NumberOfPlayersPerLine < 3 || body.NumberOfPlayersPerLine > 5 || body.NumberOfLinesPerMatch < 5 || body.NumberOfLinesPerMatch > 16 {
+		w.WriteHeader(400)
+	}
 	res := h.process(body.NumberOfPlayers, body.NumberOfLinesPerMatch, body.NumberOfPlayersPerLine)
 	resAsBytes, err := json.Marshal(res)
 	if err != nil {
@@ -93,7 +96,7 @@ func (h *processingHandler) process(numberOfPlayers, numberOfLines, lineSize int
 	res := result{
 		BestMatch: make([][]string, 0),
 	}
-	for ; bestPossibleGamesNumber < len(h.PossibleGames) && h.PossibleGames[bestPossibleGamesNumber].Score >= h.PossibleGames[0].Score; bestPossibleGamesNumber++ {
+	for ; bestPossibleGamesNumber < 25 && bestPossibleGamesNumber < len(h.PossibleGames) && h.PossibleGames[bestPossibleGamesNumber].Score >= h.PossibleGames[0].Score; bestPossibleGamesNumber++ {
 		res.BestMatch = append(res.BestMatch, h.gameAsArrayOfPlayers(*h.PossibleGames[bestPossibleGamesNumber]))
 	}
 	fmt.Printf("Found %d best games\n", bestPossibleGamesNumber)
