@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"bytes"
 	"encoding/json"
+	"strings"
 )
 
 func init() {
-	http.HandleFunc("/api", handler)
+	http.HandleFunc("/", handler)
 }
 
 type query struct {
@@ -25,6 +26,16 @@ type result struct {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, "/api") {
+		http.Redirect(w, r, strings.Split(r.URL.String(), r.URL.Path)[0] + "/web/hockeyKidsLinesPage.html", http.StatusPermanentRedirect)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		w.WriteHeader(405)
+		return
+	}
+
 	decoder := json.NewDecoder(r.Body)
 	var body query
 	if err := decoder.Decode(&body); err != nil {
@@ -35,8 +46,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		PossibleLinesAsArray: make([]uint16, 0),
 		PossibleGames: make([]*game, 0),
 	}
-	if body.NumberOfPlayers > 16 || body.NumberOfPlayers < 7 || body.NumberOfPlayersPerLine < 3 || body.NumberOfPlayersPerLine > 5 || body.NumberOfLinesPerMatch < 5 || body.NumberOfLinesPerMatch > 16 {
+	if body.NumberOfPlayers > 16 || body.NumberOfPlayers < 7 || body.NumberOfPlayersPerLine < 3 || body.NumberOfPlayersPerLine > 5 || body.NumberOfLinesPerMatch < 5 || body.NumberOfLinesPerMatch > 16 || body.NumberOfPlayers % body.NumberOfPlayersPerLine == 0 {
 		w.WriteHeader(400)
+		return
 	}
 	res := h.process(body.NumberOfPlayers, body.NumberOfLinesPerMatch, body.NumberOfPlayersPerLine)
 	resAsBytes, err := json.Marshal(res)

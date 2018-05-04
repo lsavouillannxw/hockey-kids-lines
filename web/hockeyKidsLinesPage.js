@@ -3,10 +3,17 @@ function submitForm(){
     $(":input").each(function() {
         postData[$(this).attr("name")] = parseInt($(this).val());
     });
-    console.log(postData)
+    if (postData.numberOfPlayers % postData.numberOfPlayersPerLine == 0) {
+        $("p").html("Sorry, you don't need help as you number of players can be divided by the number of players per line");
+        return
+    }
+    if (postData.numberOfPlayers < 2 * postData.numberOfPlayersPerLine) {
+        $("p").html("Sorry, you don't have enough players to build 2 lines");
+        return
+    }
     $.ajax({
         type: "post",
-        url: "../api",
+        url: window.location.pathname.startsWith('/web/hockeyKidsLinesPage.html') ? '../api' : '/api',
         data: JSON.stringify(postData),
         success: displayResult,
         error: function (data) {
@@ -17,12 +24,18 @@ function submitForm(){
 }
 
 function displayResult(data) {
+    $("p").html("");
     let root = $(result);
     let innerDiv = "";
-    for (let i of JSON.parse(data).bestMatch) {
-        innerDiv += buildMatchView(i) + "\n"
+    let bestMatch = JSON.parse(data).bestMatch;
+    if (bestMatch.length == 0) {
+        $("p").html("Sorry, we didn't managed to fin a correct solution to your problem");
+    } else {
+        for (let i of bestMatch) {
+            innerDiv += buildMatchView(i) + "\n"
+        }
+        root.html(innerDiv)
     }
-    root.html(innerDiv)
 }
 
 function buildMatchView(data) {
