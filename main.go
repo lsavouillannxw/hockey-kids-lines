@@ -9,16 +9,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"strings"
+	"strconv"
 )
 
 func init() {
 	http.HandleFunc("/", handler)
-}
-
-type query struct {
-	NumberOfPlayers int64 `json:"numberOfPlayers"`
-	NumberOfPlayersPerLine int64 `json:"numberOfPlayersPerLine"`
-	NumberOfLinesPerMatch int64 `json:"numberOfLinesPerMatch"`
 }
 
 type result struct {
@@ -31,26 +26,32 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodGet {
 		w.WriteHeader(405)
 		return
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	var body query
-	if err := decoder.Decode(&body); err != nil {
-		panic(err)
+	numberOfPlayers, err := strconv.Atoi(r.URL.Query().Get("numberOfPlayers"))
+	if err != nil {
+		w.WriteHeader(400)
 	}
-	defer r.Body.Close()
+	numberOfPlayersPerLine, err := strconv.Atoi(r.URL.Query().Get("numberOfPlayersPerLine"))
+	if err != nil {
+		w.WriteHeader(400)
+	}
+	numberOfLinesPerMatch, err := strconv.Atoi(r.URL.Query().Get("numberOfLinesPerMatch"))
+	if err != nil {
+		w.WriteHeader(400)
+	}
 	h := &processingHandler{
 		PossibleLinesAsArray: make([]uint16, 0),
 		PossibleGames: make([]*game, 0),
 	}
-	if body.NumberOfPlayers > 16 || body.NumberOfPlayers < 7 || body.NumberOfPlayersPerLine < 3 || body.NumberOfPlayersPerLine > 5 || body.NumberOfLinesPerMatch < 5 || body.NumberOfLinesPerMatch > 16 || body.NumberOfPlayers % body.NumberOfPlayersPerLine == 0 {
+	if numberOfPlayers > 16 || numberOfPlayers < 7 || numberOfPlayersPerLine < 3 || numberOfPlayersPerLine > 5 || numberOfLinesPerMatch < 5 || numberOfLinesPerMatch > 16 || numberOfPlayers % numberOfPlayersPerLine == 0 {
 		w.WriteHeader(400)
 		return
 	}
-	res := h.process(body.NumberOfPlayers, body.NumberOfLinesPerMatch, body.NumberOfPlayersPerLine)
+	res := h.process(numberOfPlayers, numberOfLinesPerMatch, numberOfPlayersPerLine)
 	resAsBytes, err := json.Marshal(res)
 	if err != nil {
 		panic(err)
@@ -65,7 +66,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 //	}).process(9, 10, 4))
 //}
 
-func (h *processingHandler) process(numberOfPlayers, numberOfLines, lineSize int64) result {
+func (h *processingHandler) process(numberOfPlayers, numberOfLines, lineSize int) result {
 	uintNumberOfPlayers := uint(numberOfPlayers)
 	uintNumberOfLines := uint(numberOfLines)
 	uintLineSize := uint(lineSize)
@@ -108,7 +109,7 @@ func (h *processingHandler) process(numberOfPlayers, numberOfLines, lineSize int
 	res := result{
 		BestMatch: make([][]string, 0),
 	}
-	for ; bestPossibleGamesNumber < 25 && bestPossibleGamesNumber < len(h.PossibleGames) && h.PossibleGames[bestPossibleGamesNumber].Score >= h.PossibleGames[0].Score; bestPossibleGamesNumber++ {
+	for ; bestPossibleGamesNumber < 5 && bestPossibleGamesNumber < len(h.PossibleGames) && h.PossibleGames[bestPossibleGamesNumber].Score >= h.PossibleGames[0].Score; bestPossibleGamesNumber++ {
 		res.BestMatch = append(res.BestMatch, h.gameAsArrayOfPlayers(*h.PossibleGames[bestPossibleGamesNumber]))
 	}
 	fmt.Printf("Found %d best games\n", bestPossibleGamesNumber)
