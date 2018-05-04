@@ -99,7 +99,7 @@ func (h *processingHandler) process(numberOfPlayers, numberOfLines, lineSize int
 
 	game := createGame(uintNumberOfPlayers, uintNumberOfLines)
 	game.Lines[0] = (uint16(1) << uintLineSize) - 1
-	game.Lines[1] = ((uint16(1) << uintLineSize) - 1) << uintLineSize
+	game.Lines[1] = ((uint16(1) << uintLineSize) - 1) << (uintNumberOfPlayers - uintLineSize)
 	h.buildGame(&game, 2)
 	//game.displayLines()
 	//game.fillPlayersFromLines()
