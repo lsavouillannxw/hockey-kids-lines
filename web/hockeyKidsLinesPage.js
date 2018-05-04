@@ -29,7 +29,7 @@ function displayResult(data) {
     let innerDiv = "";
     let bestMatch = JSON.parse(data).bestMatch;
     if (bestMatch.length == 0) {
-        $("p").html("Sorry, we didn't managed to fin a correct solution to your problem");
+        $("p").html("Sorry, we didn't manage to find a correct solution to your problem");
     } else {
         for (let i of bestMatch) {
             innerDiv += buildMatchView(i) + "\n"
@@ -39,6 +39,10 @@ function displayResult(data) {
 }
 
 function buildMatchView(data) {
+    let playerNames = $("select").val();
+    for (let i = playerNames.length + 1; i <= data.length; i++) {
+        playerNames.push(`Player ${i}`);
+    }
     let result = ["<table border='1'>"];
     let i = 0;
     result.push(`<tr><th>Presence</th>`);
@@ -48,7 +52,7 @@ function buildMatchView(data) {
     i = 0;
     result.push("</tr>");
     for(let row of data) {
-        result.push(`<tr><th>Player ${++i}</th>`);
+        result.push(`<tr><th>${playerNames[i++]}</th>`);
         for(let cell of row.split("").reverse().join("")){
             result.push(`<td>${cell == '0' ? '': i}</td>`);
         }

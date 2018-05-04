@@ -7,41 +7,45 @@
 
     <!-- Bootstrap core CSS -->
     <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'/>
-    <style>th {
-        padding: 5px;
-    }
-    td {
-        padding: 5px;
-    }</style>
+    <link rel="stylesheet" href="hockeyKidsLinesPage.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
+    <script src="https://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
     <script src="hockeyKidsLinesPage.js"></script>
 </head>
 
 <body>
 <div class="container">
     <h2>Hockey Kids Lines Page</h2>
-    <h3>Here, you can build "optimized" lines to help kids playing same amount of time and with stable lines while your count is not perfect</h3>
-    <p class="lead"></p>
+    <h3>Here, you can build "optimized" lines to help kids playing same amount of time with stable lines</h3>
     <form class="form-inline" id="myForm" onsubmit="submitForm(); return false;">
-        <div class='form-group'>
-            <label for='numberOfPlayers'>Players</label>
-            <input type='number' class='form-control' name='numberOfPlayers' id='numberOfPlayers' value='9' min="7" max="16">
+        <div class="form-row">
+            <div class='form-group'>
+                <label for='numberOfPlayers'>Players</label>
+                <input type='number' class='form-control' name='numberOfPlayers' id='numberOfPlayers' value='9' min="7" max="16">
+            </div>
+            <div class='form-group'>
+                <label for='numberOfPlayersPerLine'>Line size</label>
+                <input type='number' class='form-control' name='numberOfPlayersPerLine' id='numberOfPlayersPerLine' value='4' min="3" max="5">
+            </div>
+            <div class='form-group'>
+                <label for='numberOfLinesPerMatch'>Lines per match</label>
+                <input type='number' class='form-control' name='numberOfLinesPerMatch' id='numberOfLinesPerMatch' value='10' min="5" max="16">
+            </div>
+            <div class='form-group'>
+                <button type='submit' class='btn btn-primary'>Submit</button>
+            </div>
         </div>
-        <div class='form-group'>
-            <label for='numberOfPlayersPerLine'>Line size</label>
-            <input type='number' class='form-control' name='numberOfPlayersPerLine' id='numberOfPlayersPerLine' value='4' min="3" max="5">
-        </div>
-        <div class='form-group'>
-            <label for='numberOfLinesPerMatch'>Lines per match</label>
-            <input type='number' class='form-control' name='numberOfLinesPerMatch' id='numberOfLinesPerMatch' value='10' min="5" max="16">
-        </div>
-        <div class='form-group'>
-            <button type='submit' class='btn btn-primary'>Submit</button>
+        <br>
+        <div class="form-row">
+            <div class='form-group'>
+                <label for='playerNames'>Player Names</label>
+                <select multiple data-role="tagsinput" autocomplete='given-name' class="form-control" name='playerNames' id='playerNames'></select>
+            </div>
         </div>
     </form>
     <br>
     <br>
+    <p class="lead"></p>
     <div id="result">
     </div>
 </div>
