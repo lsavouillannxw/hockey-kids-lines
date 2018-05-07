@@ -1,20 +1,20 @@
 package service
 
 import (
-	"math/bits"
 	"math"
+	"math/bits"
 )
 
 type Game struct {
 	Players []uint16
-	Lines []uint16
-	Score float64
+	Lines   []uint16
+	Score   float64
 }
 
 func NewGame(numberOfPlayers, numberOfLines int) *Game {
 	return &Game{
 		Players: make([]uint16, numberOfPlayers),
-		Lines: make([]uint16, numberOfLines),
+		Lines:   make([]uint16, numberOfLines),
 	}
 }
 
@@ -55,17 +55,16 @@ func (g *Game) Evaluate() {
 			max = cpt
 		}
 	}
-	g.Score = -math.Pow10(max - min) * 2
+	g.Score = -math.Pow10(max-min) * 2
 
 	for i := 0; i < len(g.Lines); i++ {
 		for j := i + 1; j < len(g.Lines); j++ {
 			if g.Lines[i] == g.Lines[j] {
 				g.Score += 10
-				if i + 2 == j {
+				if i+2 == j {
 					g.Score += 30
 				}
 			}
 		}
 	}
 }
-

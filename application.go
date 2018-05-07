@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"HockeyLines/rest"
+	"github.com/lsavouillannxw/hockey-kids-lines/rest"
 )
 
 func init() {
