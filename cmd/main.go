@@ -11,13 +11,13 @@ import (
 
 func main() {
 	defer DisplayTime(time.Now())
-	numberOfPlayers := flag.Int("numberOfPlayers", 10, "the number of players you have")
-	lineSize := flag.Int("lineSize", 4, "the size of a line")
+	numberOfPlayers := flag.Int("numberOfPlayers", 7, "the number of players you have")
+	lineSize := flag.Int("lineSize", 3, "the size of a line")
 	numberOfLines := flag.Int("numberOfLines", 10, "the number of lines you need during the game")
 
 	flag.Parse()
 
-	result := service.NewProcessingResult(*service.NewProcessingHandler().Process(*numberOfPlayers, *numberOfLines, *lineSize), *numberOfPlayers, *numberOfLines)
+	result := service.NewProcessingResult(*service.NewProcessingHandler(*numberOfPlayers, *numberOfLines, *lineSize).Process())
 	for _, g := range result.BestMatch {
 		for _, l := range g {
 			fmt.Println(reverse_rmuller(l))

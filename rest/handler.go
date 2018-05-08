@@ -36,7 +36,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
-	res := service.NewProcessingResult(*service.NewProcessingHandler().Process(numberOfPlayers, numberOfLinesPerMatch, numberOfPlayersPerLine), numberOfPlayers, numberOfLinesPerMatch)
+	res := service.NewProcessingResult(*service.NewProcessingHandler(numberOfPlayers, numberOfLinesPerMatch, numberOfPlayersPerLine).Process())
 	resAsBytes, err := json.Marshal(res)
 	if err != nil {
 		panic(err)

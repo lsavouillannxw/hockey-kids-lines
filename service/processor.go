@@ -7,23 +7,32 @@ import (
 )
 
 type ProcessingHandler struct {
+	// Input
+	NumberOfPlayers int
+	NumberOfLines   int
+	LineSize        int
+	// Computed
 	PossibleLinesAsArray []uint16
-	PossibleGames        []*Game
 	AppearancesCounter   [][]int
 	MaxAppearances       int
-	MaxScore             float64
+	// Output
+	PossibleGames []*Game
+	MaxScore      float64
 }
 
-func NewProcessingHandler() *ProcessingHandler {
+func NewProcessingHandler(numberOfPlayers, numberOfLines, lineSize int) *ProcessingHandler {
 	return &ProcessingHandler{
+		NumberOfPlayers:      numberOfPlayers,
+		NumberOfLines:        numberOfLines,
+		LineSize:             lineSize,
 		PossibleLinesAsArray: make([]uint16, 0),
 		PossibleGames:        make([]*Game, 0),
 	}
 }
 
-func (h *ProcessingHandler) Process(numberOfPlayers, numberOfLines, lineSize int) *ProcessingHandler {
-	uintNumberOfPlayers := uint(numberOfPlayers)
-	uintLineSize := uint(lineSize)
+func (h *ProcessingHandler) Process() *ProcessingHandler {
+	uintNumberOfPlayers := uint(h.NumberOfPlayers)
+	uintLineSize := uint(h.LineSize)
 	intLineSize := int(uintLineSize)
 
 	maskOnes := uint16(1) << uintNumberOfPlayers
@@ -31,14 +40,14 @@ func (h *ProcessingHandler) Process(numberOfPlayers, numberOfLines, lineSize int
 	//log.Printf("%0.16b\n", maskOnes)
 	//log.Printf("%0.16b\n", maskZeros)
 
-	h.MaxAppearances = lineSize * numberOfLines / numberOfPlayers
-	if lineSize*numberOfLines%numberOfPlayers > 0 {
+	h.MaxAppearances = h.LineSize * h.NumberOfLines / h.NumberOfPlayers
+	if h.LineSize*h.NumberOfLines%h.NumberOfPlayers > 0 {
 		h.MaxAppearances++
 	}
 	log.Printf("Max appearance: %d", h.MaxAppearances)
-	h.AppearancesCounter = make([][]int, numberOfLines)
-	for i := 0; i < numberOfLines; i++ {
-		h.AppearancesCounter[i] = make([]int, numberOfPlayers)
+	h.AppearancesCounter = make([][]int, h.NumberOfLines)
+	for i := 0; i < h.NumberOfLines; i++ {
+		h.AppearancesCounter[i] = make([]int, h.NumberOfPlayers)
 	}
 
 	var possibleLinesAsMap = make(map[uint16]bool, 0)
@@ -58,15 +67,15 @@ func (h *ProcessingHandler) Process(numberOfPlayers, numberOfLines, lineSize int
 		h.PossibleLinesAsArray = append(h.PossibleLinesAsArray, k)
 	}
 
-	game := NewGame(numberOfPlayers, numberOfLines)
+	game := NewGame(h.NumberOfPlayers, h.NumberOfLines)
 	game.Lines[0] = (uint16(1) << uintLineSize) - 1
-	for i := 0; i < lineSize; i++ {
+	for i := 0; i < h.LineSize; i++ {
 		h.AppearancesCounter[0][i]++
 		h.AppearancesCounter[1][i]++
 	}
 	game.Lines[1] = ((uint16(1) << uintLineSize) - 1) << (uintNumberOfPlayers - uintLineSize)
-	for i := 0; i < lineSize; i++ {
-		h.AppearancesCounter[1][numberOfPlayers - 1 - i]++
+	for i := 0; i < h.LineSize; i++ {
+		h.AppearancesCounter[1][h.NumberOfPlayers-1-i]++
 	}
 	h.buildAllPossibleGames(game, 2)
 	sort.Slice(h.PossibleGames, func(i, j int) bool { return h.PossibleGames[i].Score > h.PossibleGames[j].Score })
@@ -74,7 +83,7 @@ func (h *ProcessingHandler) Process(numberOfPlayers, numberOfLines, lineSize int
 }
 
 func (h *ProcessingHandler) buildAllPossibleGames(game *Game, currentLine int) {
-	if currentLine == len(game.Lines) {
+	if currentLine == h.NumberOfLines {
 		//game.FillPlayersFromLines()
 		game.Evaluate()
 		if game.Score >= h.MaxScore {
@@ -90,15 +99,19 @@ func (h *ProcessingHandler) buildAllPossibleGames(game *Game, currentLine int) {
 		}
 		cpt := uint16(1)
 		invalid := false
-		for i := 0; i < len(h.AppearancesCounter[currentLine]); i++ {
+		for i := 0; i < h.NumberOfPlayers; i++ {
 			if cpt&h.PossibleLinesAsArray[k] != 0 {
-				h.AppearancesCounter[currentLine][i] = h.AppearancesCounter[currentLine - 1][i] + 1
+				h.AppearancesCounter[currentLine][i] = h.AppearancesCounter[currentLine-1][i] + 1
 				if h.AppearancesCounter[currentLine][i] > h.MaxAppearances {
 					invalid = true
 					break // A player can't play more than MaxAppearances
 				}
 			} else {
-				h.AppearancesCounter[currentLine][i] = h.AppearancesCounter[currentLine - 1][i]
+				h.AppearancesCounter[currentLine][i] = h.AppearancesCounter[currentLine-1][i]
+				if h.AppearancesCounter[currentLine][i]+((h.NumberOfLines-currentLine)/2) < h.MaxAppearances-1 {
+					invalid = true
+					break // A player can't play more than MaxAppearances
+				}
 			}
 			cpt = cpt * 2
 		}
