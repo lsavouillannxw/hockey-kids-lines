@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"github.com/lsavouillannxw/hockey-kids-lines/rest"
+	"net/http"
 )
 
 func init() {

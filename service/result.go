@@ -19,6 +19,6 @@ func NewProcessingResult(h ProcessingHandler, numberOfPlayers, numberOfLines int
 			res.BestMatch = append(res.BestMatch, printer.GameAsArrayOfPlayers(*h.PossibleGames[bestPossibleGamesNumber]))
 		}
 	}
-	log.Printf("Found %d best games and returning %d\n", bestPossibleGamesNumber, len(res.BestMatch))
+	log.Printf("Found %d best games in %d built and returning %d with score: %f\n", bestPossibleGamesNumber, len(h.PossibleGames), len(res.BestMatch), h.PossibleGames[0].Score)
 	return res
 }

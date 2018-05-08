@@ -1,10 +1,5 @@
 package service
 
-import (
-	"math"
-	"math/bits"
-)
-
 type Game struct {
 	Players []uint16
 	Lines   []uint16
@@ -18,7 +13,7 @@ func NewGame(numberOfPlayers, numberOfLines int) *Game {
 	}
 }
 
-func (g Game) clone() *Game {
+func (g Game) Clone() *Game {
 	result := NewGame(len(g.Players), len(g.Lines))
 	result.Score = g.Score
 	copy(result.Lines, g.Lines)
@@ -44,19 +39,7 @@ func (g Game) FillPlayersFromLines() {
 }
 
 func (g *Game) Evaluate() {
-	min := len(g.Lines)
-	max := 0
-	for i := 0; i < len(g.Players); i++ {
-		cpt := bits.OnesCount16(g.Players[i])
-		if cpt < min {
-			min = cpt
-		}
-		if cpt > max {
-			max = cpt
-		}
-	}
-	g.Score = -math.Pow10(max-min) * 2
-
+	g.Score = 0
 	for i := 0; i < len(g.Lines); i++ {
 		for j := i + 1; j < len(g.Lines); j++ {
 			if g.Lines[i] == g.Lines[j] {

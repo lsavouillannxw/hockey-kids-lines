@@ -38,6 +38,7 @@ func (h Printer) displayPlayer(player uint16) string {
 }
 
 func (h Printer) GameAsArrayOfPlayers(g Game) []string {
+	g.FillPlayersFromLines()
 	res := make([]string, 0)
 	for i := 0; i < len(g.Players); i++ {
 		res = append(res, h.displayPlayer(g.Players[i]))

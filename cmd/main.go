@@ -4,23 +4,30 @@ import (
 	"flag"
 	"fmt"
 	"github.com/lsavouillannxw/hockey-kids-lines/service"
+	"log"
+	"time"
 	"unicode/utf8"
 )
 
 func main() {
-	numberOfPlayers := flag.Int("numberOfPlayers", 9, "the number of players you have")
+	defer DisplayTime(time.Now())
+	numberOfPlayers := flag.Int("numberOfPlayers", 10, "the number of players you have")
 	lineSize := flag.Int("lineSize", 4, "the size of a line")
 	numberOfLines := flag.Int("numberOfLines", 10, "the number of lines you need during the game")
 
 	flag.Parse()
 
 	result := service.NewProcessingResult(*service.NewProcessingHandler().Process(*numberOfPlayers, *numberOfLines, *lineSize), *numberOfPlayers, *numberOfLines)
-	for _, m := range result.BestMatch {
-		for _, l := range m {
+	for _, g := range result.BestMatch {
+		for _, l := range g {
 			fmt.Println(reverse_rmuller(l))
 		}
 		fmt.Println()
 	}
+}
+
+func DisplayTime(start time.Time) {
+	log.Printf("Program executed in %s", time.Since(start))
 }
 
 func reverse_rmuller(s string) string {
