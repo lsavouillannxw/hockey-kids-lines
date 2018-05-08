@@ -2,8 +2,7 @@ package service
 
 import (
 	"testing"
-	"fmt"
-	"time"
+	"log"
 )
 
 func TestProcess7103(t *testing.T) {
@@ -56,23 +55,13 @@ func TestProcess10104(t *testing.T) {
 }
 
 func TestProcess(t *testing.T) {
-	for p := 7; p <= 16; p++ {
-		for l := 5; l <= 16; l++ {
-			for s := 3; s <= 5; s++ {
+	for s := 3; s <= 5; s++ {
+		for p := 7; p <= 16; p++ {
+			for l := 5; l <= 16; l++ {
 				if p % s == 0 {
 					continue
 				}
-				c := make(chan string, 1)
-				go func() {
-					fmt.Printf("for %d players on %d lines of size %d, maxScore is: %f ", p, l, s, NewProcessingHandler(p, l, s).Process().MaxScore)
-					c <- "done"
-				}()
-				select {
-				case _ = <-c:
-					fmt.Printf("for %d players on %d lines of size %d done", p, l, s)
-				case <-time.After(time.Minute):
-					fmt.Printf("for %d players on %d lines of size %d: TIMEOUT" , p, l, s)
-				}
+				log.Printf("for %d players on %d lines of size %d, maxScore is: %f\n", p, l, s, NewProcessingHandler(p, l, s).Process().MaxScore)
 			}
 		}
 	}
