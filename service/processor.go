@@ -84,7 +84,6 @@ func (h *ProcessingHandler) Process() *ProcessingHandler {
 
 func (h *ProcessingHandler) buildAllPossibleGames(game *Game, currentLine int) {
 	if currentLine == h.NumberOfLines {
-		//game.FillPlayersFromLines()
 		game.Evaluate()
 		if game.Score >= h.MaxScore {
 			h.MaxScore = game.Score
@@ -110,7 +109,7 @@ func (h *ProcessingHandler) buildAllPossibleGames(game *Game, currentLine int) {
 				h.AppearancesCounter[currentLine][i] = h.AppearancesCounter[currentLine-1][i]
 				if h.AppearancesCounter[currentLine][i]+((h.NumberOfLines-currentLine)/2) < h.MaxAppearances-1 {
 					invalid = true
-					break // A player can't play more than MaxAppearances
+					break // A player must play at least MaxAppearances - 1
 				}
 			}
 			cpt = cpt * 2

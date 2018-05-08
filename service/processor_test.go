@@ -3,6 +3,10 @@ package service
 import (
 	"testing"
 	"log"
+	"github.com/gin-gonic/gin/json"
+	"io/ioutil"
+	"fmt"
+	"os"
 )
 
 func TestProcess7103(t *testing.T) {
@@ -56,12 +60,25 @@ func TestProcess10104(t *testing.T) {
 
 func TestProcess(t *testing.T) {
 	for s := 3; s <= 5; s++ {
-		for p := 7; p <= 16; p++ {
-			if p % s == 0 {
-				continue
-			}
-			for l := 5; l <= 16; l++ {
-				log.Printf("for %d players on %d lines of size %d, maxScore is: %f\n", p, l, s, NewProcessingHandler(p, l, s).Process().MaxScore)
+		for l := 5; l <= 16; l++ {
+			for p := 7; p <= 16; p++ {
+				if p%s == 0 || p < s * 2 {
+					continue
+				}
+				name := fmt.Sprintf("%dp-%dl-%ds.json", p, l, s)
+				if _, err := os.Stat("./results/" + name); err == nil {
+					continue
+				}
+				log.Printf("Computing %d players on %d lines of size %d\n", p, l, s)
+				processingHandler := NewProcessingHandler(p, l, s).Process()
+				log.Printf("for %d players on %d lines of size %d, maxScore is: %f\n", p, l, s, processingHandler.MaxScore)
+				data, err := json.Marshal(*NewProcessingResult(*processingHandler))
+				if err != nil {
+					panic(err)
+				}
+				if err := ioutil.WriteFile("./results/"+name, data, 0644); err != nil {
+					panic(err)
+				}
 			}
 		}
 	}
